@@ -10,6 +10,9 @@ const myVideo = document.createElement('video');
 // mute our video
 myVideo.muted = true;
 
+// create a variable to track peers
+const peers = {};
+
 navigator.mediaDevices
   .getUserMedia({
     video: true,
@@ -36,6 +39,12 @@ navigator.mediaDevices
     });
   });
 
+// when a user leaves a room
+socket.on('user-disconnected', userId => {
+  // check if peer exists then close stream
+  if (peers[userId]) peers[userId].close();
+});
+
 myPeer.on('open', id => {
   socket.emit('join-room', ROOM_ID, id);
 });
@@ -53,6 +62,9 @@ function connectToNewUser(userId, stream) {
   call.on('close', () => {
     video.remove();
   });
+
+  // link userId to a call
+  peers[userId] = call;
 }
 
 // add video stream function
