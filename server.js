@@ -20,8 +20,8 @@ app.get('/:room', (req, res) => {
 
 io.on('connection', socket => {
   socket.on('join-room', (roomId, userId) => {
-    console.log({ roomId });
-    console.log({ userId });
+    socket.join(roomId);
+    socket.to(roomId).broadcast.emit('user-connected', userId);
   });
 });
 
